@@ -70,7 +70,7 @@ const userCreation = async (req, res) => {
         }
 
         const createUser = await userModel.create(requestBody)
-        return res.status(200).send({ status: true, msg: " user created successfully", data: createUser })
+        return res.status(201).send({ status: true, msg: " user created successfully", data: createUser })
 
     } catch (err) {
         return res.status(500).send({ status: false, msg: err.message })
@@ -106,14 +106,18 @@ const userLogin =async (req,res)=>{
        if(email && password){
         let checkAvailability = await userModel.findOne({email:email,password:password})
         if(checkAvailability){
-            let token = jwt.sign({userId:checkAvailability._id},"secret",{expiresIn:"10h"})
-            return res.status(200).send({status:true,token:token})
+            const payload = { "userId":checkAvailability['_id'].toString(), 'exp': Math.floor(Date.now() / 1000) + (60*2), "iat": Math.floor(Date.now() / 1000) }
+            const jwtToken = jwt.sign(payload, 'secret')
+
+            let obj = { userId:checkAvailability['_id'].toString(), token: jwtToken, 
+            iat: (Math.floor(Date.now() / 1000)), exp: (Math.floor(Date.now() / 1000) + 60 * 2) }
+            return res.status(200).send({status:true,token:obj})
         }else{
-            return res.status(404).send({status:false,msg:"Invalid credentials"})
+            return res.status(401).send({status:false,msg:"Invalid credentials"})
         }
        }
     
-    
+
     
     }
     catch(err){

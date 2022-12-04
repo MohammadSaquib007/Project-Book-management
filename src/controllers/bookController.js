@@ -79,7 +79,7 @@ const bookCreation = async (req, res) => {
         }
 
 const bookDetails = await bookModel.create(requestBody)
-  return res.status(200).send({status:false,msg:"book created successfully",data:bookDetails})
+  return res.status(201).send({status:false,msg:"book created successfully",data:bookDetails})
     } catch (err) {
         return res.status(500).send({ status: false, msg: err.message })
     }
@@ -153,15 +153,15 @@ const updateBook = async function (req, res) {
       const reqBook = req.params.bookId
 
       if (!valid.invalidInput(reqBook)) {
-          return res.status(404).send({ status: false, msg: "pls provide bookId" })
+          return res.status(400).send({ status: false, msg: "pls provide bookId" })
       }
       if (!valid.isValidObjectId(reqBook)) {
-          return res.status(404).send({ status: false, msg: "invalid bookId" })
+          return res.status(400).send({ status: false, msg: "invalid bookId" })
       }
         if(reqBook){
           const checkId = await bookModel.findOne({_id:reqBook})
           if(!checkId)
-          return res.status(404).send({status:false,msg:"book Id not found"})
+          return res.status(400).send({status:false,msg:"book Id not found"})
         }
 
       let { title, excerpt, releasedAt, ISBN } = requestBody
@@ -206,7 +206,7 @@ const updateBook = async function (req, res) {
       const updating = await bookModel.findByIdAndUpdate({ _id: reqBook, isDeleted: false }, {  title:title, excerpt:excerpt, releasedAt:releasedAt, ISBN:ISBN}, { new: true }).select({deletedAt:0})
 
       if (!updating) {
-          return res.status(404).send({ status: false, msg: "book updatation failed" })
+          return res.status(400).send({ status: false, msg: "book updatation failed" })
       } else {
           return res.status(200).send({ status: true, msg: "book updated successfully", data: updating })
       }
@@ -222,15 +222,15 @@ const bookDeletion = async function (req, res) {
 
         const removeBook = req.params.bookId
         if (!valid.invalidInput(removeBook)) {
-            return res.status(404).send({ status: false, msg: "pls provide bookId" })
+            return res.status(400).send({ status: false, msg: "pls provide bookId" })
         }
         if (!valid.isValidObjectId(removeBook)) {
-            return res.status(404).send({ status: false, msg: "invalid bookId" })
+            return res.status(400).send({ status: false, msg: "invalid bookId" })
         }
           if(removeBook){
             const check= await bookModel.findOne({_id:removeBook,isDeleted:false})
             if(!check)
-            return res.status(404).send({status:false,msg:"book Id not found"})
+            return res.status(400).send({status:false,msg:"book Id not found"})
             
           }
            let deleteBook = await bookModel.findByIdAndUpdate({ _id: removeBook }, { $set: { isDeleted: true ,deletedAt:Date.now()} }, { new: true })
