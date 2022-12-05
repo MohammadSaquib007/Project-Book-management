@@ -61,6 +61,7 @@ const isValidStreet = function (street) {
 
   return re.test(street);
 };
+
 function onlyNumbers(val) {
   if (val < 1 || val > 5) {
     return false;

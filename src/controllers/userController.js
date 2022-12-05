@@ -5,6 +5,7 @@ const jwt=require("jsonwebtoken")
 const userCreation = async (req, res) => {
 
     try {
+
         let requestBody = req.body
 
         const { title, name, phone, email, password, address } = requestBody
@@ -106,7 +107,7 @@ const userLogin =async (req,res)=>{
        if(email && password){
         let checkAvailability = await userModel.findOne({email:email,password:password})
         if(checkAvailability){
-            const payload = { "userId":checkAvailability['_id'].toString(), 'exp': Math.floor(Date.now() / 1000) + (60*2), "iat": Math.floor(Date.now() / 1000) }
+            const payload = { "userId":checkAvailability['_id'].toString(), 'exp': Math.floor(Date.now() / 1000) + (60*60), "iat": Math.floor(Date.now() / 1000) }
             const jwtToken = jwt.sign(payload, 'secret')
 
             let obj = { userId:checkAvailability['_id'].toString(), token: jwtToken, 
